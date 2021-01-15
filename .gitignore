@@ -1,0 +1,15 @@
+/ldapapi/target/
+/ldapapi/HELP.md
+
+/ldapapi/.mvn/wrapper/maven-wrapper.jar
+/ldapapi/src/main/**/target/
+/ldapapi/src/test/**/target/
+
+### STS ###
+/ldapapi/.apt_generated
+/ldapapi/.classpath
+/ldapapi/.factorypath
+/ldapapi/.project
+/ldapapi/.settings
+/ldapapi/.springBeans
+/ldapapi/.sts4-cache
