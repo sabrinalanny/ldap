@@ -1,0 +1,59 @@
+version: "3.7"
+services:
+    ldap-service:
+        image: osixia/openldap:1.4.0
+        container_name: ldap-service       
+        environment:
+          LDAP_ADMIN_PASSWORD: "123456"
+          LDAP_BASE_DN: "dc=techinterview,dc=com"
+          LDAP_ORGANISATION: "My Company"
+          LDAP_DOMAIN: "techinterview.com"
+        ports:
+           - 389:389
+        hostname: localhost
+        domainname: localhost
+        restart: always  
+        networks:
+            - "networks-api-ldap"        
+    ldap_server_admin:
+        image: osixia/phpldapadmin:0.9.0
+        container_name: phpldapadmin-service
+        hostname: phpldapadmin-service
+        ports:
+            - 6443:443
+        environment:
+          PHPLDAPADMIN_LDAP_HOSTS: ldap-service
+        links:
+          - ldap-service:localhost
+        depends_on:
+          - ldap-service
+        networks:
+            - "networks-api-ldap" 
+    openldap-seed:
+        image: osixia/openldap:1.4.0
+        links:
+            - ldap-service:localhost
+        volumes:
+            - ./ldapserver:/ldif_files    
+        entrypoint: bash '/ldif_files/ldapmodify.sh'  
+        depends_on:
+          - ldap-service 
+        networks:
+            - "networks-api-ldap" 
+    ldapapi:
+        image: spring-boot-rest-docker-image
+        build:
+          context: ./ldapapi/
+          dockerfile: Dockerfile
+        ports:
+            - 8080:8080
+        depends_on:
+          - ldap-service
+        restart: always
+        links:
+          - ldap-service:localhost
+        networks:
+            - "networks-api-ldap"           
+networks:
+  networks-api-ldap:
+    driver: "bridge"
